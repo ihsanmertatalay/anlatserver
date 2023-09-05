@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 import multer from "multer";
 import myUser from "../db/user.js";
 import myRoom from "../db/emptyroom.js";
+const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = pkg;
+import pkg from 'agora-token';
+
 
 const router = express.Router();
 
@@ -172,4 +175,76 @@ router.delete("/room/:id", async (req, res) => {
     console.log(error);
   }
 });
+
+
+router.get("/token", async (req, res) => {
+  try {
+
+    // Rtc Examples
+  const appId = 'acec74e5063744bfa5d5ac184d1fa4b3';
+  const appCertificate = '3b3a886ab743415986372c10a2e7a8b8';
+  const channelName = "a";
+  const uid = "a"
+  const userAccount = "a";
+  const role = RtcRole.PUBLISHER;
+
+  const expirationTimeInSeconds = 3600
+
+  const currentTimestamp = Math.floor(Date.now() / 1000)
+
+  const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+
+  // IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
+
+  // Build token with uid
+  const tokenA = RtcTokenBuilder.buildTokenWithUid(appId, appCertificate, "a", 0, role, privilegeExpiredTs);
+  console.log("Token With Integer Number Uid: " + tokenA);
+
+  // Build token with user account
+  //const tokenB = RtcTokenBuilder.buildTokenWithAccount(appId, appCertificate, channelName, userAccount, role, privilegeExpiredTs);
+  //console.log("Token With UserAccount: " + tokenB);
+
+   // const createdRoom = await myRoom.create(theRoom);
+    res.status(200).json(tokenA);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+
+router.post("/token", async (req, res) => {
+  try {
+    const myToken = req.body;
+
+    // Rtc Examples
+  const appId = 'acec74e5063744bfa5d5ac184d1fa4b3';
+  const appCertificate = '3b3a886ab743415986372c10a2e7a8b8';
+  const channelName = myToken.channel;
+  const uid = myToken.name;
+  const userAccount = myToken.name;
+  const role = RtcRole.PUBLISHER;
+
+  const expirationTimeInSeconds = 3600
+
+  const currentTimestamp = Math.floor(Date.now() / 1000)
+
+  const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+
+  // IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
+
+  // Build token with uid
+  const tokenA = RtcTokenBuilder.buildTokenWithUid(appId, appCertificate, myToken.channel, myToken.name, role, privilegeExpiredTs);
+  console.log("Token With Integer Number Uid: " + tokenA);
+
+  // Build token with user account
+  //const tokenB = RtcTokenBuilder.buildTokenWithAccount(appId, appCertificate, channelName, userAccount, role, privilegeExpiredTs);
+  //console.log("Token With UserAccount: " + tokenB);
+
+   // const createdRoom = await myRoom.create(theRoom);
+    res.status(200).json(tokenA);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 export default router;
